@@ -10,8 +10,13 @@ const short int joystickX = A0;
 const short int joystickY = A1;
 const short int joystickButton = A2;
 
+int *coordX = new int; 
+int *coordY = new int;
+boolean *button;
+
 void setup()
 {
+    Serial.begin(9600); 
     servo.attach(2);
     
     for (int i = 0; i < 4; i++)
@@ -29,19 +34,21 @@ void setup()
 
 void loop()
 {
+    getJoystick(coordX, coordY, button);
+    motorControl(*coordX);
+    servoControl(*coordY);
     
 }
 
-void getJoystick(short int *coordX, short int *coordY, bool *button)
+void getJoystick(int *coordX, int *coordY, boolean *button)
 {
     *coordX = analogRead(joystickX) / 128;
     *coordY = analogRead(joystickY) / 128;
-    
     if (*coordX > 3)
         *coordX -= 4;
     else
-        *coordX -=3;
-    
+        *coordX -= 3;
+    //Serial.println(*coordX);
     if (*coordY > 3)
         *coordY -= 4;
     else
@@ -61,32 +68,32 @@ bool laserShot(void)
 bool motorControl(short int speed)
 {
     static short int degree = 0;
-    if (degree < 180 && degree > -180)
+    if (degree < 300 && speed > 0)
     {
-        if (speed > 0)
-        {
-            motorForward(4-speed);
-            degree++;
-        }
-        else if (speed < 0)
-        {
-            motorBack(4+speed);
-            degree--;
-        }
+        motorForward(4-speed);
+        degree++;
         return true;
     }
-    else
-        return false;
+    else if (degree > -300 && speed < 0)
+    {
+        motorBack(4+speed);
+        degree--;
+        return true;
+    }
+    return false;
 }
 
 void servoControl(short int speed)
 {
     static short int degree = 90;
+    degree += speed;
     if (degree < 180 && degree > 0)
     {
-        degree += speed;
         servo.write(degree);
     }
+    else 
+        degree = 90;
+    
 }
 
 
