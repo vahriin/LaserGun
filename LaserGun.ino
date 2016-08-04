@@ -1,10 +1,10 @@
 #include <Servo.h>
 
-const short int motorInput[4] = {13,5,6,7};
-Servo servo;
-const short int redLed = 4;
-const short int greenLed = 3;
-const short int laser = 8;
+const short int motorInput[4] = {13,5,6,7}; //управление мотором
+Servo servo; // управление сервомотором
+const short int redLed = 4; //индикатор перезарядки
+const short int yellowLed = 3; //индикатор готовности к стрельбе
+const short int laser = 8; //индикатор выстрела
 
 const short int joystickX = A0;
 const short int joystickY = A1;
@@ -12,11 +12,12 @@ const short int joystickButton = A2;
 
 int *coordX = new int; 
 int *coordY = new int;
-boolean *button;
+boolean *button = new boolean;
+boolean gunReady = true;
 
 void setup()
 {
-    Serial.begin(9600); 
+  Serial.begin(9600);
     servo.attach(2);
     
     for (int i = 0; i < 4; i++)
@@ -24,7 +25,7 @@ void setup()
         pinMode(motorInput[i], OUTPUT);
     }
     pinMode(redLed, OUTPUT);
-    pinMode(greenLed, OUTPUT);
+    pinMode(yellowLed, OUTPUT);
     pinMode(laser, OUTPUT);
     
     pinMode(joystickX, INPUT);
@@ -35,55 +36,95 @@ void setup()
 void loop()
 {
     getJoystick(coordX, coordY, button);
-    if (*coordX != 0)
+    
+    // дабы не делать лишних вызовов функций
+    if (*coordX != 0) 
         motorControl(*coordX);
     else
-        delay(10);
+        delay(10); // для уравнивания скорости
     if (*coordY != 0)
         servoControl(*coordY);
+Serial.println(*button);
+    if(!(*button) || (!gunReady))
+        gunReady = gunGuard(*button);
+    
 }
+
+//get section
 
 void getJoystick(int *coordX, int *coordY, boolean *button)
 {
-    *coordX = analogRead(joystickX) / 128;
+    *coordX = analogRead(joystickX) / 128; //оставляем значения 0-7
     *coordY = analogRead(joystickY) / 128;
     if (*coordX > 3)
-        *coordX -= 4;
+        *coordX -= 4; //приводим к значениям -3 - 3
     else
         *coordX -= 3;
-    //Serial.println(*coordX);
     if (*coordY > 3)
         *coordY -= 4;
     else
         *coordY -=3;
     
-    *button = (bool *)analogRead(joystickButton);
+    *button = (boolean*)analogRead(joystickButton);
 }
 
-bool laserShot(void)
+//laser section
+
+bool gunGuard(bool shot)
+{
+    const int reloadTime = 5000;
+    static unsigned long timeShot = 0;
+    if(!(shot) && (millis() - timeShot) > reloadTime) //нажата кнопка и орудие перезарядилось
+    {
+        digitalWrite(yellowLed, LOW); //выключим индикатор готовности к стрельбе
+        laserShot(); //стреляем
+        digitalWrite(redLed, HIGH); //включим индикатор перезарядки
+        timeShot = millis();
+        return false;
+    }
+    else if (shot && (millis() - timeShot) > reloadTime) //кнопка не нажата, но орудие перезарядилось
+    {
+        digitalWrite(redLed, LOW); //выключим индикатор перезарядки
+        digitalWrite(yellowLed, HIGH); //включим индикатор готовности к стрельбе
+        return true;
+    }
+    else if (!(shot) && (millis() - timeShot) < reloadTime) //орудие не перезарядилось, но кнопка нажата
+    {
+        digitalWrite(yellowLed, HIGH); //моргнем, чтобы показать, что юзер дурень.
+        delay(50);
+        digitalWrite(yellowLed, LOW);
+        return false;
+    }
+    else 
+    {
+        return false;
+    }
+}
+
+
+void laserShot(void)
 {
     digitalWrite(laser, HIGH);
     delay(500);
     digitalWrite(laser, LOW);
-    return true;
 }
 
-bool motorControl(short int speed)
+
+//move section
+
+void motorControl(short int speed)
 {
     static short int degree = 0;
     if (degree < 300 && speed > 0)
     {
-        motorForward(4-speed);
+        motorForward(4-speed); //разворачиваем значение
         degree++;
-        return true;
     }
     else if (degree > -300 && speed < 0)
     {
         motorBack(4+speed);
         degree--;
-        return true;
     }
-    return false;
 }
 
 void servoControl(short int speed)
@@ -107,7 +148,7 @@ void servoControl(short int speed)
 
 //very long shitcode
 
-void motorForward(short int speed)
+void motorForward(short int speed) // чем больше speed, тем медленнее едем
 {
     digitalWrite(motorInput[0], LOW); 
     digitalWrite(motorInput[1], LOW ); 
