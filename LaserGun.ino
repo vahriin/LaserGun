@@ -35,9 +35,12 @@ void setup()
 void loop()
 {
     getJoystick(coordX, coordY, button);
-    motorControl(*coordX);
-    servoControl(*coordY);
-    
+    if (*coordX != 0)
+        motorControl(*coordX);
+    else
+        delay(10);
+    if (*coordY != 0)
+        servoControl(*coordY);
 }
 
 void getJoystick(int *coordX, int *coordY, boolean *button)
@@ -85,15 +88,19 @@ bool motorControl(short int speed)
 
 void servoControl(short int speed)
 {
-    static short int degree = 90;
+    static short int degree = 900;
     degree += speed;
-    if (degree < 180 && degree > 0)
+    if (degree <= 1800 && degree >= 0)
     {
-        servo.write(degree);
+        servo.write(degree / 10);
     }
     else 
-        degree = 90;
-    
+    {
+        if (degree >= 1800)
+            degree = 1800;
+        else
+            degree = 50;
+    }
 }
 
 
