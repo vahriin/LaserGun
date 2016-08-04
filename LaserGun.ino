@@ -58,7 +58,7 @@ bool laserShot(void)
     return true;
 }
 
-bool motorWork(short int speed)
+bool motorControl(short int speed)
 {
     static short int degree = 0;
     if (degree < 180 && degree > -180)
@@ -73,17 +73,25 @@ bool motorWork(short int speed)
             motorBack(4+speed);
             degree--;
         }
-        else
-            return false;
         return true;
     }
     else
         return false;
 }
 
+void servoControl(short int speed)
+{
+    static short int degree = 90;
+    if (degree < 180 && degree > 0)
+    {
+        degree += speed;
+        servo.write(degree);
+    }
+}
 
 
 
+//very long shitcode
 
 void motorForward(short int speed)
 {
