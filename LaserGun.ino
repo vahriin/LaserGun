@@ -4,6 +4,8 @@ const short int motorInput[4] = {5,6,7,13};
 Servo servo;
 const short int redLed = 4;
 const short int greenLed = 3;
+const short int laser = 8;
+
 const short int joystickX = A0;
 const short int joystickY = A1;
 const short int joystickButton = A2;
@@ -18,6 +20,7 @@ void setup()
     }
     pinMode(redLed, OUTPUT);
     pinMode(greenLed, OUTPUT);
+    pinMode(laser, OUTPUT);
     
     pinMode(joystickX, INPUT);
     pinMode(joystickY, INPUT);
@@ -28,3 +31,32 @@ void loop()
 {
     
 }
+
+void getJoystick(short int *coordX, short int *coordY, bool *button)
+{
+    *coordX = analogRead(joystickX) / 128;
+    *coordY = analogRead(joystickY) / 128;
+    
+    if (*coordX > 3)
+        *coordX -= 4;
+    else
+        *coordX -=3;
+    
+    if (*coordY > 3)
+        *coordY -= 4;
+    else
+        *coordY -=3;
+    
+    *button = (bool *)analogRead(joystickButton);
+}
+
+bool laserShot(void)
+{
+    digitalWrite(laser, HIGH);
+    delay(500);
+    digitalWrite(laser, LOW);
+    return true;
+}
+
+
+
