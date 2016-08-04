@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-const short int motorInput[4] = {5,6,7,13};
+const short int motorInput[4] = {13,5,6,7};
 Servo servo;
 const short int redLed = 4;
 const short int greenLed = 3;
@@ -58,5 +58,132 @@ bool laserShot(void)
     return true;
 }
 
+bool motorWork(short int speed)
+{
+    static short int degree = 0;
+    if (degree < 180 && degree > -180)
+    {
+        if (speed > 0)
+        {
+            motorForward(4-speed);
+            degree++;
+        }
+        else if (speed < 0)
+        {
+            motorBack(4+speed);
+            degree--;
+        }
+        else
+            return false;
+        return true;
+    }
+    else
+        return false;
+}
 
+
+
+
+
+void motorForward(short int speed)
+{
+    digitalWrite(motorInput[0], LOW); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], HIGH ); 
+    digitalWrite(motorInput[3], HIGH );
+    delay(speed);
+
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], HIGH ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], HIGH ); 
+    digitalWrite(motorInput[2], HIGH ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], HIGH ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+
+    digitalWrite(motorInput[0], HIGH ); 
+    digitalWrite(motorInput[1], HIGH ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+
+    digitalWrite(motorInput[0], HIGH ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+
+    digitalWrite(motorInput[0], HIGH ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], HIGH );
+    delay(speed);
+
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], HIGH );
+    delay(speed);
+}
+
+void motorBack(short int speed)
+{    
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], HIGH );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], HIGH ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], HIGH );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], HIGH ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], HIGH ); 
+    digitalWrite(motorInput[1], HIGH ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], HIGH ); 
+    digitalWrite(motorInput[2], LOW ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], HIGH ); 
+    digitalWrite(motorInput[2], HIGH ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], LOW ); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], HIGH ); 
+    digitalWrite(motorInput[3], LOW );
+    delay(speed);
+    
+    digitalWrite(motorInput[0], LOW); 
+    digitalWrite(motorInput[1], LOW ); 
+    digitalWrite(motorInput[2], HIGH ); 
+    digitalWrite(motorInput[3], HIGH );
+    delay(speed);
+}
 
