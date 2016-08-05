@@ -71,7 +71,7 @@ void getJoystick(int *coordX, int *coordY, boolean *button)
 
 boolean gunGuard(boolean shot)
 {
-    const int reloadTime = 8000;
+    const int reloadTime = 5000;
     static unsigned long timeShot = 0;
     if(!(shot) && (millis() - timeShot) > reloadTime) //нажата кнопка и орудие перезарядилось
     {
