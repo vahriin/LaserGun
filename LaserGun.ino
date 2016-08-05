@@ -2,8 +2,8 @@
 
 const short int motorInput[4] = {13,5,6,7}; //управление мотором
 Servo servo; // управление сервомотором
-const short int redLed = 4; //индикатор перезарядки
-const short int yellowLed = 3; //индикатор готовности к стрельбе
+const short int redLed = 3; //индикатор перезарядки
+const short int yellowLed = 4; //индикатор готовности к стрельбе
 const short int laser = 8; //индикатор выстрела
 
 const short int joystickX = A0;
@@ -17,7 +17,6 @@ boolean gunReady = true;
 
 void setup()
 {
-  Serial.begin(9600);
     servo.attach(2);
     
     for (int i = 0; i < 4; i++)
@@ -30,7 +29,7 @@ void setup()
     
     pinMode(joystickX, INPUT);
     pinMode(joystickY, INPUT);
-    pinMode(joystickButton, INPUT);
+    pinMode(joystickButton, INPUT_PULLUP);
 }
 
 void loop()
@@ -44,7 +43,7 @@ void loop()
         delay(10); // для уравнивания скорости
     if (*coordY != 0)
         servoControl(*coordY);
-Serial.println(*button);
+        
     if(!(*button) || (!gunReady))
         gunReady = gunGuard(*button);
     
@@ -65,20 +64,20 @@ void getJoystick(int *coordX, int *coordY, boolean *button)
     else
         *coordY -=3;
     
-    *button = (boolean*)analogRead(joystickButton);
+    *button = (boolean*)digitalRead(joystickButton);
 }
 
 //laser section
 
-bool gunGuard(bool shot)
+boolean gunGuard(boolean shot)
 {
-    const int reloadTime = 5000;
+    const int reloadTime = 8000;
     static unsigned long timeShot = 0;
     if(!(shot) && (millis() - timeShot) > reloadTime) //нажата кнопка и орудие перезарядилось
     {
         digitalWrite(yellowLed, LOW); //выключим индикатор готовности к стрельбе
-        laserShot(); //стреляем
         digitalWrite(redLed, HIGH); //включим индикатор перезарядки
+        laserShot(); //стреляем
         timeShot = millis();
         return false;
     }
