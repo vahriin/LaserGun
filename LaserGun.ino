@@ -53,12 +53,14 @@ void loop()
 
 void getJoystick(int *coordX, int *coordY, boolean *button)
 {
-    *coordX = analogRead(joystickX) / 128; //оставляем значения 0-7
+    *coordX = analogRead(joystickX) / 64; //оставляем значения 0-7
     *coordY = analogRead(joystickY) / 128;
-    if (*coordX > 3)
-        *coordX -= 4; //приводим к значениям -3 - 3
+    if (*coordX > 9)
+        *coordX -= 8; //приводим к значениям -7 - 7
+    else if (*coordX < 6)
+        *coordX -= 7;
     else
-        *coordX -= 3;
+        *coordX = 0;
     if (*coordY > 3)
         *coordY -= 4;
     else
@@ -116,12 +118,12 @@ void motorControl(short int speed)
     static short int degree = 0;
     if (degree < 300 && speed > 0)
     {
-        motorForward(4-speed); //разворачиваем значение
+        motorForward(8-speed); //разворачиваем значение
         degree++;
     }
     else if (degree > -300 && speed < 0)
     {
-        motorBack(4+speed);
+        motorBack(8+speed);
         degree--;
     }
 }
