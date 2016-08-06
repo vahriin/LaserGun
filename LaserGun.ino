@@ -53,18 +53,20 @@ void loop()
 
 void getJoystick(int *coordX, int *coordY, boolean *button)
 {
-    *coordX = analogRead(joystickX) / 64; //оставляем значения 0-7
-    *coordY = analogRead(joystickY) / 128;
-    if (*coordX > 9)
-        *coordX -= 8; //приводим к значениям -7 - 7
-    else if (*coordX < 6)
-        *coordX -= 7;
+    *coordX = analogRead(joystickX) / 32; //оставляем значения 0-7
+    *coordY = analogRead(joystickY) / 64;
+    if (*coordX > 19)
+        *coordX -= 16; //приводим к значениям -7 - 7
+    else if (*coordX < 13)
+        *coordX -= 15;
     else
         *coordX = 0;
-    if (*coordY > 3)
-        *coordY -= 4;
+   if (*coordY > 9)
+        *coordY -= 8; //приводим к значениям -7 - 7
+    else if (*coordY < 6)
+        *coordY -= 7;
     else
-        *coordY -=3;
+        *coordY = 0;
     
     *button = (boolean*)digitalRead(joystickButton);
 }
@@ -118,30 +120,30 @@ void motorControl(short int speed)
     static short int degree = 0;
     if (degree < 300 && speed > 0)
     {
-        motorForward(8-speed); //разворачиваем значение
+        motorForward(16-speed); //разворачиваем значение
         degree++;
     }
     else if (degree > -300 && speed < 0)
     {
-        motorBack(8+speed);
+        motorBack(16+speed);
         degree--;
     }
 }
 
 void servoControl(short int speed)
 {
-    static short int degree = 900;
-    degree += speed;
-    if (degree <= 1800 && degree >= 0)
+    static int degree = 9000;
+    degree += 3*speed;
+    if (degree <= 18000 && degree >= 0)
     {
-        servo.write(degree / 10);
+        servo.write(degree / 100);
     }
     else 
     {
-        if (degree >= 1800)
-            degree = 1800;
+        if (degree >= 18000)
+            degree = 18000;
         else
-            degree = 50;
+            degree = 500;
     }
 }
 
